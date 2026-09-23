@@ -29,26 +29,44 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate Official Android Scaffolding and Gradle Wrapper
+      - name: Generate Official Android Scaffolding and Configure Build
         run: |
           rm -rf android
           flutter create . --platforms=android --org com.kanzenaseem --project-name kanz_e_naseem
           
-          # Set minSdk to 21 in android/app/build.gradle
-          sed -i 's/minSdk = flutter.minSdk/minSdk = 21/g' android/app/build.gradle
-          sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
-
-          # Inject permissions and Urdu app title
+          # Python script to safely configure android/app/build.gradle and AndroidManifest.xml
           python3 -c "
-          p = 'android/app/src/main/AndroidManifest.xml'
-          with open(p, 'r') as f:
-              c = f.read()
+          import re
+
+          # 1. Update android/app/build.gradle
+          bg_path = 'android/app/build.gradle'
+          with open(bg_path, 'r') as f:
+              bg = f.read()
+
+          # Replace minSdkVersion or minSdk cleanly with 21
+          bg = re.sub(r'minSdk(Version)?\s*=\s*flutter\.minSdk(Version)?', 'minSdk = 21', bg)
+          
+          # Ensure multiDexEnabled is true for Firebase
+          if 'multiDexEnabled' not in bg:
+              bg = bg.replace('defaultConfig {', 'defaultConfig {\n        multiDexEnabled true')
+
+          with open(bg_path, 'w') as f:
+              f.write(bg)
+
+          # 2. Update android/app/src/main/AndroidManifest.xml
+          mf_path = 'android/app/src/main/AndroidManifest.xml'
+          with open(mf_path, 'r') as f:
+              mf = f.read()
+
           perms = '''    <uses-permission android:name=\"android.permission.INTERNET\"/>\n    <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>\n    <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n'''
-          if '<application' in c:
-              c = c.replace('<application', perms + '    <application')
-              c = c.replace('android:label=\"kanz_e_naseem\"', 'android:label=\"کنزِ نسیم\"')
-          with open(p, 'w') as f:
-              f.write(c)
+          if '<application' in mf:
+              mf = mf.replace('<application', perms + '    <application')
+              mf = mf.replace('android:label=\"kanz_e_naseem\"', 'android:label=\"کنزِ نسیم\"')
+
+          with open(mf_path, 'w') as f:
+              f.write(mf)
+              
+          print('Successfully configured Android build.gradle and AndroidManifest.xml')
           "
 
       - name: Get Flutter Dependencies
