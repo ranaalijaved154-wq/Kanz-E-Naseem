@@ -122,9 +122,10 @@ class _SoutTabState extends State<SoutTab> {
         // Audio Playlist Stream
         Expanded(
           child: StreamBuilder<List<AudioModel>>(
+            initialData: _contentService.localAudios,
             stream: _contentService.streamAudios(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                 return const Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(AppTheme.accentGold),

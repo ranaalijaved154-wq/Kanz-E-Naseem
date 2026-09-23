@@ -22,7 +22,6 @@ class ContentService {
   List<AudioModel> get localAudios => List.unmodifiable(_localAudios);
   List<MemoryModel> get localMemories => List.unmodifiable(_localMemories);
 
-  // Initial Content Preloads (From Sarkar G Books Collection)
   final List<BookModel> _localBooks = [
     BookModel(
       id: 'book_01',
@@ -194,22 +193,29 @@ class ContentService {
   // KUTUB (BOOKS)
   // -------------------------------------------------------------
 
-  Stream<List<BookModel>> streamBooks() {
-    if (isFirebaseAvailable && _firestore != null) {
-      return _firestore!
-          .collection(AppConstants.booksCollection)
-          .orderBy('createdAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-            final docs = snapshot.docs.map((doc) => BookModel.fromDocument(doc)).toList();
-            if (docs.isEmpty) return _localBooks;
-            return docs;
-          })
-          .handleError((_) => _localBooks);
-    }
+  Stream<List<BookModel>> streamBooks() async* {
+    yield List<BookModel>.unmodifiable(_localBooks);
 
-    _emitBooks();
-    return _booksController.stream;
+    if (isFirebaseAvailable && _firestore != null) {
+      try {
+        final stream = _firestore!
+            .collection(AppConstants.booksCollection)
+            .orderBy('createdAt', descending: true)
+            .snapshots()
+            .map<List<BookModel>>((snapshot) {
+              final docs = snapshot.docs.map((doc) => BookModel.fromDocument(doc)).toList();
+              return docs.isEmpty ? List<BookModel>.unmodifiable(_localBooks) : docs;
+            });
+
+        await for (final books in stream) {
+          yield books;
+        }
+      } catch (_) {
+        yield List<BookModel>.unmodifiable(_localBooks);
+      }
+    } else {
+      yield* _booksController.stream;
+    }
   }
 
   Future<String> addBook(BookModel book) async {
@@ -244,22 +250,29 @@ class ContentService {
   // SOUT O BAYAN (AUDIOS)
   // -------------------------------------------------------------
 
-  Stream<List<AudioModel>> streamAudios() {
-    if (isFirebaseAvailable && _firestore != null) {
-      return _firestore!
-          .collection(AppConstants.audiosCollection)
-          .orderBy('createdAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-            final docs = snapshot.docs.map((doc) => AudioModel.fromDocument(doc)).toList();
-            if (docs.isEmpty) return _localAudios;
-            return docs;
-          })
-          .handleError((_) => _localAudios);
-    }
+  Stream<List<AudioModel>> streamAudios() async* {
+    yield List<AudioModel>.unmodifiable(_localAudios);
 
-    _emitAudios();
-    return _audiosController.stream;
+    if (isFirebaseAvailable && _firestore != null) {
+      try {
+        final stream = _firestore!
+            .collection(AppConstants.audiosCollection)
+            .orderBy('createdAt', descending: true)
+            .snapshots()
+            .map<List<AudioModel>>((snapshot) {
+              final docs = snapshot.docs.map((doc) => AudioModel.fromDocument(doc)).toList();
+              return docs.isEmpty ? List<AudioModel>.unmodifiable(_localAudios) : docs;
+            });
+
+        await for (final audios in stream) {
+          yield audios;
+        }
+      } catch (_) {
+        yield List<AudioModel>.unmodifiable(_localAudios);
+      }
+    } else {
+      yield* _audiosController.stream;
+    }
   }
 
   Future<String> addAudio(AudioModel audio) async {
@@ -294,22 +307,29 @@ class ContentService {
   // YADAIN O SAWANEH (MEMORIES)
   // -------------------------------------------------------------
 
-  Stream<List<MemoryModel>> streamMemories() {
-    if (isFirebaseAvailable && _firestore != null) {
-      return _firestore!
-          .collection(AppConstants.memoriesCollection)
-          .orderBy('createdAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-            final docs = snapshot.docs.map((doc) => MemoryModel.fromDocument(doc)).toList();
-            if (docs.isEmpty) return _localMemories;
-            return docs;
-          })
-          .handleError((_) => _localMemories);
-    }
+  Stream<List<MemoryModel>> streamMemories() async* {
+    yield List<MemoryModel>.unmodifiable(_localMemories);
 
-    _emitMemories();
-    return _memoriesController.stream;
+    if (isFirebaseAvailable && _firestore != null) {
+      try {
+        final stream = _firestore!
+            .collection(AppConstants.memoriesCollection)
+            .orderBy('createdAt', descending: true)
+            .snapshots()
+            .map<List<MemoryModel>>((snapshot) {
+              final docs = snapshot.docs.map((doc) => MemoryModel.fromDocument(doc)).toList();
+              return docs.isEmpty ? List<MemoryModel>.unmodifiable(_localMemories) : docs;
+            });
+
+        await for (final memories in stream) {
+          yield memories;
+        }
+      } catch (_) {
+        yield List<MemoryModel>.unmodifiable(_localMemories);
+      }
+    } else {
+      yield* _memoriesController.stream;
+    }
   }
 
   Future<String> addMemory(MemoryModel memory) async {

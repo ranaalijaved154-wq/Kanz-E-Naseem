@@ -144,9 +144,10 @@ class _YadainTabState extends State<YadainTab> {
         // Memories Stream List / Grid
         Expanded(
           child: StreamBuilder<List<MemoryModel>>(
+            initialData: _contentService.localMemories,
             stream: _contentService.streamMemories(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                 return const Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(AppTheme.accentGold),

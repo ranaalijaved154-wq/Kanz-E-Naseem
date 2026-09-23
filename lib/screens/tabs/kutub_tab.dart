@@ -79,9 +79,10 @@ class _KutubTabState extends State<KutubTab> {
         // Books Stream List
         Expanded(
           child: StreamBuilder<List<BookModel>>(
+            initialData: _contentService.localBooks,
             stream: _contentService.streamBooks(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                 return const Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(AppTheme.accentGold),
