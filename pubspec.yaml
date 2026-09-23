@@ -1,0 +1,31 @@
+name: kanz_e_naseem
+description: "Kanz-e-Naseem (کنزِ نسیم) - Islamic App with Authentication, Admin Gatekeeper, and Content Modules"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+  firebase_storage: ^12.3.4
+  google_fonts: ^6.2.1
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+  just_audio: ^0.9.40
+  syncfusion_flutter_pdfviewer: ^26.2.11
+  file_picker: ^8.1.4
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

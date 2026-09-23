@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>کنزِ نسیم (Kanz-e-Naseem) - لائیو انٹرفیس پریویو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-emerald: #0F5132;
+      --primary-dark: #072F1D;
+      --primary-light: #1B7347;
+      --accent-gold: #C59B27;
+      --accent-gold-light: #DFBA4E;
+      --accent-gold-dark: #9E7A18;
+      --bg-light: #F9F9F6;
+      --text-dark: #1A202C;
+      --text-muted: #718096;
+      --border-grey: #E2E8F0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Amiri', serif;
+      background: #111827;
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Top Control Bar */
+    .top-bar {
+      width: 100%;
+      background: #1f2937;
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent-gold);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--accent-gold-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-title span {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: #9ca3af;
+    }
+
+    .screen-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: #374151;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Amiri', serif;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--accent-gold);
+      color: white;
+    }
+
+    .nav-btn.active {
+      background: var(--primary-emerald);
+      color: white;
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 10px rgba(197, 155, 39, 0.4);
+    }
+
+    /* Device Mockup Canvas */
+    .preview-container {
+      margin: 24px auto;
+      width: 420px;
+      max-width: 95vw;
+      height: 840px;
+      background: var(--bg-light);
+      border-radius: 40px;
+      border: 12px solid #2d3748;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px #4a5568;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Phone Speaker & Camera Notch */
+    .device-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 20px;
+      background: #2d3748;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notch-camera {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1a202c;
+    }
+
+    .notch-speaker {
+      width: 40px;
+      height: 4px;
+      border-radius: 4px;
+      background: #1a202c;
+    }
+
+    /* App Frame Container */
+    .app-screen {
+      width: 100%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding-top: 24px;
+      position: relative;
+      background: var(--bg-light);
+    }
+
+    .app-screen.active {
+      display: flex;
+    }
+
+    /* Top App Bar */
+    .app-bar {
+      background: var(--primary-emerald);
+      color: white;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .app-bar-title {
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-pill {
+      background: var(--accent-gold);
+      color: var(--primary-dark);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Card styling */
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      margin: 14px 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    /* Form Fields */
+    .field-group {
+      margin-bottom: 16px;
+      text-align: right;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-dark);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input, .input-wrapper textarea {
+      width: 100%;
+      padding: 12px 14px;
+      padding-right: 40px;
+      border: 1.2px solid var(--border-grey);
+      border-radius: 12px;
+      font-family: 'Amiri', 'Outfit', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .input-wrapper input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px rgba(197, 155, 39, 0.15);
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 14px;
+      color: var(--primary-emerald);
+      font-size: 16px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary-emerald);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Amiri', serif;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(15, 81, 50, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-outline {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: var(--primary-emerald);
+      border: 1.5px solid var(--primary-emerald);
+      border-radius: 14px;
+      font-family: 'Amiri', serif;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-outline.danger {
+      color: #dc2626;
+      border-color: #dc2626;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      background: white;
+      border-top: 1px solid var(--border-grey);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      position: sticky;
+      bottom: 0;
+      width: 100%;
+      z-index: 40;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      gap: 4px;
+      font-weight: bold;
+    }
+
+    .nav-item.active {
+      color: var(--primary-emerald);
+    }
+
+    .nav-item i {
+      font-size: 18px;
+    }
+
+    /* Sticky Mini-Player */
+    .mini-player {
+      background: white;
+      margin: 8px 12px;
+      border-radius: 14px;
+      border: 1.2px solid rgba(197, 155, 39, 0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .mini-disc {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-emerald));
+      border: 1.5px solid var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-gold-light);
+      animation: rotate 6s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Grid for Books */
+    .books-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .book-card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #edf2f7;
+    }
+
+    .book-cover {
+      height: 140px;
+      background: linear-gradient(135deg, #093E28, #165B37);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-gold-light);
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .book-cover i {
+      font-size: 32px;
+      margin-bottom: 6px;
+    }
+
+    .book-pages-badge {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Audio List Card */
+    .audio-item {
+      background: white;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-grey);
+    }
+
+    .audio-play-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(15, 81, 50, 0.1);
+      color: var(--primary-emerald);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Gallery Timeline */
+    .memory-item {
+      background: white;
+      border-radius: 16px;
+      margin: 12px 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .memory-img-box {
+      height: 180px;
+      background: #e2e8f0;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Instructions Modal */
+    .info-banner {
+      background: #fffbeb;
+      border: 1px solid #fef3c7;
+      color: #92400e;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 10px 14px;
+    }
+
+    .floating-fab {
+      position: absolute;
+      bottom: 74px;
+      left: 18px;
+      background: var(--primary-emerald);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 30px;
+      border: none;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Amiri', serif;
+      font-weight: bold;
+      font-size: 15px;
+      z-index: 45;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Controls to switch screens -->
+  <header class="top-bar">
+    <div class="brand-title">
+      <i class="fa-solid fa-book-quran"></i> کنزِ نسیم
+      <span>Kanz-e-Naseem Live UI Preview</span>
+    </div>
+
+    <div class="screen-selector">
+      <button class="nav-btn active" onclick="switchScreen('screen-login')">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> لاگ ان اسکرین
+      </button>
+      <button class="nav-btn" onclick="switchScreen('screen-register')">
+        <i class="fa-solid fa-user-plus"></i> رجسٹریشن
+      </button>
+      <button class="nav-btn" onclick="switchScreen('screen-approval')">
+        <i class="fa-solid fa-hourglass-half"></i> ایڈمن منظوری (Gate)
+      </button>
+      <button class="nav-btn" onclick="switchScreen('screen-kutub')">
+        <i class="fa-solid fa-book-open"></i> کتب و مطالعہ
+      </button>
+      <button class="nav-btn" onclick="switchScreen('screen-sout')">
+        <i class="fa-solid fa-microphone-lines"></i> صوت و بیان (آڈیو)
+      </button>
+      <button class="nav-btn" onclick="switchScreen('screen-yadain')">
+        <i class="fa-solid fa-images"></i> یادیں و سوانح
+      </button>
+      <button class="nav-btn" onclick="switchScreen('screen-admin')">
+        <i class="fa-solid fa-shield-halved"></i> ایڈمن اپلوڈ مینیجر
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Device Simulation Frame -->
+  <main class="preview-container">
+    <div class="device-notch">
+      <div class="notch-speaker"></div>
+      <div class="notch-camera"></div>
+    </div>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="screen-login" class="app-screen active">
+      <div style="text-align: center; margin-top: 30px; margin-bottom: 20px;">
+        <div style="width: 76px; height: 76px; margin: 0 auto 12px; background: rgba(15,81,50,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-gold);">
+          <i class="fa-solid fa-book-quran" style="font-size: 36px; color: var(--primary-emerald);"></i>
+        </div>
+        <h1 style="font-size: 32px; color: var(--primary-dark); font-weight: bold;">کنزِ نسیم</h1>
+        <p style="font-family: 'Outfit'; font-size: 13px; color: var(--accent-gold-dark); letter-spacing: 2px; font-weight: 600;">KANZ-E-NASEEM</p>
+        <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">علم، حکمت اور روحانیت کا خزانہ</p>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size: 20px; color: var(--primary-emerald); margin-bottom: 2px;">خوش آمدید! لاگ ان کریں</h2>
+        <p style="font-family: 'Outfit'; font-size: 12px; color: var(--text-muted); margin-bottom: 18px;">Login to access sacred materials</p>
+
+        <div class="field-group">
+          <label class="field-label">ای میل ایڈریس (Email Address)</label>
+          <div class="input-wrapper">
+            <input type="email" value="ranaalijaved154@gmail.com" placeholder="name@example.com">
+            <i class="fa-solid fa-envelope input-icon"></i>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">پاس ورڈ (Password)</label>
+          <div class="input-wrapper">
+            <input type="password" value="••••••••" placeholder="پاس ورڈ درج کریں">
+            <i class="fa-solid fa-lock input-icon"></i>
+          </div>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 16px;">
+          <a href="#" style="font-family: 'Outfit'; font-size: 12px; color: var(--accent-gold-dark); text-decoration: none; font-weight: 600;">پاس ورڈ بھول گئے؟ (Forgot Password)</a>
+        </div>
+
+        <button class="btn-primary" onclick="switchScreen('screen-kutub')">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> لاگ ان کریں (Sign In)
+        </button>
+      </div>
+
+      <div style="text-align: center; margin-top: 12px; font-size: 14px; color: var(--text-muted);">
+        نیا اکاؤنٹ بنانا چاہتے ہیں؟
+        <a href="#" onclick="switchScreen('screen-register')" style="color: var(--primary-emerald); font-weight: bold; text-decoration: underline;">رجسٹر ہوں</a>
+      </div>
+    </div>
+
+    <!-- 2. REGISTER SCREEN -->
+    <div id="screen-register" class="app-screen">
+      <div class="app-bar">
+        <div class="app-bar-title"><i class="fa-solid fa-user-plus"></i> نیا اکاؤنٹ بنائیں</div>
+        <i class="fa-solid fa-arrow-left" style="cursor: pointer;" onclick="switchScreen('screen-login')"></i>
+      </div>
+
+      <div style="text-align: center; margin: 16px 0 6px;">
+        <h2 style="font-size: 24px; color: var(--primary-dark);">رجسٹریشن فارم</h2>
+        <p style="font-family: 'Outfit'; font-size: 12px; color: var(--text-muted);">Create your Kanz-e-Naseem Account</p>
+      </div>
+
+      <div class="card">
+        <div class="field-group">
+          <label class="field-label">پورا نام (Full Name)</label>
+          <div class="input-wrapper">
+            <input type="text" placeholder="مثلاً: محمد علی جاوید">
+            <i class="fa-solid fa-user input-icon"></i>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">ای میل ایڈریس (Email Address)</label>
+          <div class="input-wrapper">
+            <input type="email" placeholder="your.email@example.com">
+            <i class="fa-solid fa-at input-icon"></i>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">پاس ورڈ (Password)</label>
+          <div class="input-wrapper">
+            <input type="password" placeholder="کم از کم 6 حروف">
+            <i class="fa-solid fa-key input-icon"></i>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">پاس ورڈ کی تصدیق (Confirm Password)</label>
+          <div class="input-wrapper">
+            <input type="password" placeholder="پاس ورڈ دوبارہ درج کریں">
+            <i class="fa-solid fa-shield-halved input-icon"></i>
+          </div>
+        </div>
+
+        <div class="info-banner" style="margin: 0 0 16px 0;">
+          <i class="fa-solid fa-circle-info"></i> رجسٹریشن کے بعد ایڈمن کی منظوری ضروری ہوگی۔ منظوری کے بعد مواد خود بخود کھل جائے گا۔
+        </div>
+
+        <button class="btn-primary" onclick="switchScreen('screen-approval')">
+          <i class="fa-solid fa-paper-plane"></i> اکاؤنٹ بنائیں (Register)
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. WAITING APPROVAL SCREEN -->
+    <div id="screen-approval" class="app-screen">
+      <div class="app-bar">
+        <div class="app-bar-title"><i class="fa-solid fa-book-quran"></i> کنزِ نسیم</div>
+        <i class="fa-solid fa-arrow-right-from-bracket" style="cursor: pointer;" onclick="switchScreen('screen-login')"></i>
+      </div>
+
+      <div style="padding: 24px 16px; text-align: center;">
+        <div style="width: 80px; height: 80px; margin: 10px auto 16px; background: rgba(197, 155, 39, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-hourglass-half" style="font-size: 38px; color: var(--accent-gold-dark);"></i>
+        </div>
+
+        <div style="display: inline-block; background: #FEF3C7; color: #92400E; padding: 6px 18px; border-radius: 20px; font-weight: bold; font-size: 13px; margin-bottom: 20px; border: 1px solid rgba(197, 155, 39, 0.4);">
+          ● زیرِ التواء (منظوری درکار ہے)
+        </div>
+
+        <div class="card" style="margin: 0; text-align: right;">
+          <div style="background: rgba(15, 81, 50, 0.05); padding: 18px; border-radius: 14px; border: 1px solid rgba(15, 81, 50, 0.15); text-align: center; margin-bottom: 18px;">
+            <p style="font-size: 19px; line-height: 1.8; color: var(--primary-dark); font-weight: bold;">
+              "آپ کی رجسٹریشن موصول ہو چکی ہے۔ ایڈمن کی منظوری کے بعد مواد تک رسائی دی جائے گی۔"
+            </p>
+          </div>
+
+          <p style="text-align: center; font-family: 'Outfit'; font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+            Your registration has been received. Access will be granted following admin approval.
+          </p>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-grey); margin-bottom: 14px;">
+
+          <div style="font-size: 14px; color: var(--primary-emerald); font-weight: bold; margin-bottom: 10px;">
+            رجسٹریشن کی تفصیلات:
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+            <span style="color: var(--text-muted);">علی احمد</span>
+            <strong>نام:</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+            <span style="color: var(--text-muted);">aliahmad@example.com</span>
+            <strong>ای میل:</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text-muted);">23 ستمبر 2026ء</span>
+            <strong>تاریخ:</strong>
+          </div>
+        </div>
+
+        <div class="info-banner" style="text-align: right; margin-top: 16px;">
+          <i class="fa-solid fa-arrows-rotate"></i> ایڈمن کی منظوری کے بعد یہ اسکرین لائیو خودکار طور پر ڈیش بورڈ پر منتقل ہو جائے گی۔
+        </div>
+
+        <button class="btn-primary" style="margin-top: 16px;" onclick="alert('اسٹیٹس چیک ہو رہا ہے: اکاؤنٹ ابھی زیرِ التواء ہے۔')">
+          <i class="fa-solid fa-rotate"></i> دوبارہ چیک کریں (Refresh Status)
+        </button>
+
+        <button class="btn-outline danger" onclick="switchScreen('screen-login')">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> لاگ آؤٹ کریں (Logout)
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. KUTUB (BOOKS TAB) -->
+    <div id="screen-kutub" class="app-screen">
+      <div class="app-bar">
+        <div class="app-bar-title"><i class="fa-solid fa-book-quran"></i> کنزِ نسیم</div>
+        <div class="admin-pill"><i class="fa-solid fa-shield"></i> ایڈمن</div>
+      </div>
+
+      <div style="padding: 10px 14px 4px;">
+        <div class="input-wrapper">
+          <input type="text" placeholder="کتاب کا عنوان تلاش کریں...">
+          <i class="fa-solid fa-magnifying-glass input-icon"></i>
+        </div>
+      </div>
+
+      <div style="padding: 0 16px; margin-top: 6px;">
+        <span style="font-size: 16px; font-weight: bold; color: var(--primary-emerald);">مبارک کتب و تحاریر (D:\Sarkar G Books)</span>
+      </div>
+
+      <!-- Books Grid -->
+      <div class="books-grid">
+        <!-- Book 1 -->
+        <div class="book-card">
+          <div class="book-cover">
+            <i class="fa-solid fa-book"></i>
+            <strong style="font-size: 14px;">آدابِ صحبتِ شیخ</strong>
+            <span class="book-pages-badge">148 صفحات</span>
+          </div>
+          <div style="padding: 10px;">
+            <button class="btn-primary" style="padding: 6px; font-size: 13px;" onclick="alert('پی ڈی ایف ویور کھل رہا ہے: آدابِ صحبتِ شیخ.pdf\nبک مارکنگ، زوم اور صفحہ نمبر انڈیکیٹر فعال ہے۔')">
+              مطالعہ کریں
+            </button>
+          </div>
+        </div>
+
+        <!-- Book 2 -->
+        <div class="book-card">
+          <div class="book-cover" style="background: linear-gradient(135deg, #072F1D, #0F5132);">
+            <i class="fa-solid fa-book-bookmark"></i>
+            <strong style="font-size: 14px;">سرمستِ صوتِ سرمدی</strong>
+            <span class="book-pages-badge">312 صفحات</span>
+          </div>
+          <div style="padding: 10px;">
+            <button class="btn-primary" style="padding: 6px; font-size: 13px;" onclick="alert('پی ڈی ایف ویور کھل رہا ہے: سرمستِ صوتِ سرمدی.pdf')">
+              مطالعہ کریں
+            </button>
+          </div>
+        </div>
+
+        <!-- Book 3 -->
+        <div class="book-card">
+          <div class="book-cover">
+            <i class="fa-solid fa-book"></i>
+            <strong style="font-size: 14px;">لماتِ نور القدس</strong>
+            <span class="book-pages-badge">240 صفحات</span>
+          </div>
+          <div style="padding: 10px;">
+            <button class="btn-primary" style="padding: 6px; font-size: 13px;" onclick="alert('پی ڈی ایف ویور کھل رہا ہے: لماتِ نور القدس.pdf')">
+              مطالعہ کریں
+            </button>
+          </div>
+        </div>
+
+        <!-- Book 4 -->
+        <div class="book-card">
+          <div class="book-cover">
+            <i class="fa-solid fa-book"></i>
+            <strong style="font-size: 14px;">مَن کہ فقیرم یا علیؑ</strong>
+            <span class="book-pages-badge">98 صفحات</span>
+          </div>
+          <div style="padding: 10px;">
+            <button class="btn-primary" style="padding: 6px; font-size: 13px;" onclick="alert('پی ڈی ایف ویور کھل رہا ہے: مَن کہ فقیرم یا علیؑ.pdf')">
+              مطالعہ کریں
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Button for Admin -->
+      <button class="floating-fab" onclick="switchScreen('screen-admin')">
+        <i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-gold-light);"></i> مواد شامل کریں
+      </button>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchScreen('screen-kutub')">
+          <i class="fa-solid fa-book"></i> کتب
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-sout')">
+          <i class="fa-solid fa-microphone"></i> صوت و بیان
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-yadain')">
+          <i class="fa-solid fa-images"></i> یادیں
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-admin')">
+          <i class="fa-solid fa-user-shield"></i> ایڈمن
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. SOUT O BAYAN (AUDIO TAB) -->
+    <div id="screen-sout" class="app-screen">
+      <div class="app-bar">
+        <div class="app-bar-title"><i class="fa-solid fa-microphone-lines"></i> صوت و بیان</div>
+        <div class="admin-pill"><i class="fa-solid fa-shield"></i> ایڈمن</div>
+      </div>
+
+      <!-- Filter chips -->
+      <div style="display: flex; gap: 8px; padding: 12px 14px; overflow-x: auto;">
+        <span style="background: var(--primary-emerald); color: white; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: bold;">تمام</span>
+        <span style="background: white; border: 1px solid var(--border-grey); color: var(--text-dark); padding: 5px 14px; border-radius: 20px; font-size: 12px;">ملفوظات شریف</span>
+        <span style="background: white; border: 1px solid var(--border-grey); color: var(--text-dark); padding: 5px 14px; border-radius: 20px; font-size: 12px;">خطبات</span>
+      </div>
+
+      <!-- Graceful Empty State as requested -->
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
+        <div style="width: 80px; height: 80px; background: rgba(197, 155, 39, 0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+          <i class="fa-solid fa-headphones" style="font-size: 36px; color: var(--accent-gold-dark);"></i>
+        </div>
+        <h3 style="font-size: 20px; font-weight: bold; color: var(--primary-dark); margin-bottom: 8px;">
+          "جلد ہی مبارک بیانات اور آڈیو ریکارڈنگز شامل کی جائیں گی۔"
+        </h3>
+        <p style="font-family: 'Outfit'; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+          Blessed lectures and audio recordings will be uploaded soon.
+        </p>
+
+        <button class="btn-primary" style="width: auto; padding: 10px 20px; font-size: 14px;" onclick="switchScreen('screen-admin')">
+          <i class="fa-solid fa-cloud-arrow-up"></i> ایڈمن: نیا بیان اپلوڈ کریں
+        </button>
+      </div>
+
+      <!-- Docked Mini-Player -->
+      <div class="mini-player" onclick="alert('فل اسکرین آڈیو پلیئر: جس میں سیک بار، +/-10 سیکنڈ اور پلے بیک رفتار کنٹرول شامل ہے۔')">
+        <div class="mini-disc"><i class="fa-solid fa-music"></i></div>
+        <div style="flex: 1; text-align: right;">
+          <strong style="font-size: 14px; display: block;">ملفوظاتِ شریف - ذکرِ الٰہی</strong>
+          <span style="font-size: 11px; color: var(--text-muted);">دورانیہ: 34:15 | پلے بیک فعال ہے</span>
+        </div>
+        <i class="fa-solid fa-circle-play" style="font-size: 30px; color: var(--primary-emerald);"></i>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="switchScreen('screen-kutub')">
+          <i class="fa-solid fa-book"></i> کتب
+        </div>
+        <div class="nav-item active" onclick="switchScreen('screen-sout')">
+          <i class="fa-solid fa-microphone"></i> صوت و بیان
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-yadain')">
+          <i class="fa-solid fa-images"></i> یادیں
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-admin')">
+          <i class="fa-solid fa-user-shield"></i> ایڈمن
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. YADAIN O SAWANEH (MEMORIES TAB) -->
+    <div id="screen-yadain" class="app-screen">
+      <div class="app-bar">
+        <div class="app-bar-title"><i class="fa-solid fa-images"></i> یادیں و سوانح</div>
+        <div class="admin-pill"><i class="fa-solid fa-shield"></i> ایڈمن</div>
+      </div>
+
+      <div style="padding: 12px 16px 4px;">
+        <span style="font-size: 16px; font-weight: bold; color: var(--primary-emerald);">مبارک تصاویر و یادگار لمحات</span>
+      </div>
+
+      <!-- Memory Card 1 -->
+      <div class="memory-item">
+        <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: white;">
+          <span style="background: rgba(197, 155, 39, 0.15); color: var(--accent-gold-dark); padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; font-family: 'Outfit';">1416ھ / 1995ء</span>
+          <strong style="font-size: 15px; color: var(--primary-dark);">حضور سرکار جی کی مبارک یادگار</strong>
+        </div>
+        <div class="memory-img-box" style="background-image: url('file:///D:/Sarkar%20G%20Books/IMG-20240110-WA0312.jpg');" onclick="alert('ہائی ریزولوشن تصویر کھولی جا رہی ہے: پنچ ٹو زوم (4.0x) اور کیپشن دستیاب ہے۔')">
+          <div style="background: rgba(0,0,0,0.4); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">
+            <i class="fa-solid fa-magnifying-glass-plus"></i> زوم کرنے کے لیے ٹیپ کریں
+          </div>
+        </div>
+        <div style="padding: 12px 14px; text-align: right; font-size: 13px; color: var(--text-dark);">
+          محفلِ روحانی کے دوران حضور سرکار جی کی ایک نادر و مبارک تصویر جو D:\Sarkar G Books سے منسلک ہے۔
+        </div>
+      </div>
+
+      <!-- Memory Card 2 -->
+      <div class="memory-item">
+        <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: white;">
+          <span style="background: rgba(197, 155, 39, 0.15); color: var(--accent-gold-dark); padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; font-family: 'Outfit';">1418ھ / 1997ء</span>
+          <strong style="font-size: 15px; color: var(--primary-dark);">محفلِ سماع و ذکر</strong>
+        </div>
+        <div class="memory-img-box" style="background-image: url('file:///D:/Sarkar%20G%20Books/IMG-20240110-WA0313.jpg');">
+          <div style="background: rgba(0,0,0,0.4); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">
+            <i class="fa-solid fa-magnifying-glass-plus"></i> زوم کرنے کے لیے ٹیپ کریں
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="switchScreen('screen-kutub')">
+          <i class="fa-solid fa-book"></i> کتب
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-sout')">
+          <i class="fa-solid fa-microphone"></i> صوت و بیان
+        </div>
+        <div class="nav-item active" onclick="switchScreen('screen-yadain')">
+          <i class="fa-solid fa-images"></i> یادیں
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-admin')">
+          <i class="fa-solid fa-user-shield"></i> ایڈمن
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. ADMIN MANAGEMENT SCREEN -->
+    <div id="screen-admin" class="app-screen">
+      <div class="app-bar">
+        <div class="app-bar-title"><i class="fa-solid fa-shield-halved"></i> ایڈمن مینیجر</div>
+        <div class="admin-pill"><i class="fa-solid fa-check"></i> Master Admin</div>
+      </div>
+
+      <div style="padding: 14px;">
+        <!-- Admin card -->
+        <div style="background: linear-gradient(135deg, var(--primary-dark), var(--primary-emerald)); color: white; padding: 18px; border-radius: 18px; margin-bottom: 16px;">
+          <h3 style="font-size: 18px; color: var(--accent-gold-light);">خاکسار ایڈمن: علی جاوید</h3>
+          <p style="font-family: 'Outfit'; font-size: 12px; color: #cbd5e1;">ranaalijaved154@gmail.com</p>
+          <div style="margin-top: 10px; font-size: 12px; background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px;">
+            <i class="fa-solid fa-folder-open"></i> مقامی فولڈر D:\Sarkar G Books سے براہ راست کتب اور تصاویر اپلوڈ کرنے کی سہولت فعال ہے۔
+          </div>
+        </div>
+
+        <h4 style="font-size: 16px; color: var(--primary-emerald); margin-bottom: 10px;">مواد اپلوڈ کریں (Firebase Storage & Firestore):</h4>
+
+        <!-- Action cards -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 18px;">
+          <div class="card" style="margin: 0; padding: 12px; text-align: center; cursor: pointer;" onclick="alert('کتاب اپلوڈ فارم: پی ڈی ایف فائل منتخب کر کے /books/ میں اپلوڈ کریں')">
+            <i class="fa-solid fa-book" style="font-size: 22px; color: var(--primary-emerald); margin-bottom: 6px;"></i>
+            <div style="font-size: 13px; font-weight: bold;">کتاب اپلوڈ</div>
+            <div style="font-size: 10px; color: var(--text-muted);">PDF</div>
+          </div>
+          <div class="card" style="margin: 0; padding: 12px; text-align: center; cursor: pointer;" onclick="alert('تصویر اپلوڈ فارم: تصویر منتخب کر کے /memories/ میں اپلوڈ کریں')">
+            <i class="fa-solid fa-image" style="font-size: 22px; color: var(--primary-emerald); margin-bottom: 6px;"></i>
+            <div style="font-size: 13px; font-weight: bold;">تصویر اپلوڈ</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Photo</div>
+          </div>
+          <div class="card" style="margin: 0; padding: 12px; text-align: center; cursor: pointer;" onclick="alert('آڈیو اپلوڈ فارم: MP3 فائل منتخب کر کے /audios/ میں اپلوڈ کریں')">
+            <i class="fa-solid fa-microphone" style="font-size: 22px; color: var(--primary-emerald); margin-bottom: 6px;"></i>
+            <div style="font-size: 13px; font-weight: bold;">بیان اپلوڈ</div>
+            <div style="font-size: 10px; color: var(--text-muted);">MP3</div>
+          </div>
+        </div>
+
+        <!-- Pending Approvals Box -->
+        <h4 style="font-size: 16px; color: var(--primary-emerald); margin-bottom: 8px;">صارفین کی منظوری (User Approvals):</h4>
+        <div class="card" style="margin: 0 0 14px; padding: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <strong style="font-size: 14px; display: block;">احمد رضا</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">ahmedraza@example.com</span>
+            </div>
+            <button style="background: var(--primary-emerald); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;" onclick="this.innerText='منظور ہو گیا ✓'; this.style.background='#16a34a';">
+              منظور کریں
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="switchScreen('screen-kutub')">
+          <i class="fa-solid fa-book"></i> کتب
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-sout')">
+          <i class="fa-solid fa-microphone"></i> صوت و بیان
+        </div>
+        <div class="nav-item" onclick="switchScreen('screen-yadain')">
+          <i class="fa-solid fa-images"></i> یادیں
+        </div>
+        <div class="nav-item active" onclick="switchScreen('screen-admin')">
+          <i class="fa-solid fa-user-shield"></i> ایڈمن
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function switchScreen(screenId) {
+      // Hide all screens
+      document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
+      // Show selected screen
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
+
+      // Update top button states
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(screenId));
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

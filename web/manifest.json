@@ -1,0 +1,23 @@
+{
+  "name": "کنزِ نسیم (Kanz-e-Naseem)",
+  "short_name": "Kanz-e-Naseem",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0F5132",
+  "theme_color": "#0F5132",
+  "description": "Kanz-e-Naseem Islamic Application",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
