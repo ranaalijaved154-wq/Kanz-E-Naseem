@@ -43,8 +43,10 @@ jobs:
           with open(bg_path, 'r') as f:
               bg = f.read()
 
-          # Replace minSdkVersion or minSdk cleanly with 21
-          bg = re.sub(r'minSdk(Version)?\s*=\s*flutter\.minSdk(Version)?', 'minSdk = 21', bg)
+          # Replace minSdkVersion or minSdk cleanly with 23 for Firebase compatibility
+          bg = re.sub(r'minSdk(Version)?[\s=]+flutter\.minSdk(Version)?', 'minSdk = 23', bg)
+          bg = re.sub(r'minSdk\s*=\s*21', 'minSdk = 23', bg)
+          bg = re.sub(r'minSdkVersion\s+21', 'minSdkVersion 23', bg)
           
           # Ensure multiDexEnabled is true for Firebase
           if 'multiDexEnabled' not in bg:
@@ -66,18 +68,19 @@ jobs:
           with open(mf_path, 'w') as f:
               f.write(mf)
               
-          print('Successfully configured Android build.gradle and AndroidManifest.xml')
+          print('Successfully configured Android build.gradle and AndroidManifest.xml with minSdk 23')
           "
 
       - name: Get Flutter Dependencies
         run: flutter pub get
 
-      - name: Build Android Release APK
-        run: flutter build apk --release --no-tree-shake-icons
+      - name: Build Android APK
+        run: |
+          flutter build apk --release --no-tree-shake-icons
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Kanz-e-Naseem-Release-APK
+          name: Kanz-e-Naseem-APK
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
