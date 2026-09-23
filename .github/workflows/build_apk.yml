@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
@@ -29,11 +29,33 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Generate Official Android Scaffolding and Gradle Wrapper
+        run: |
+          rm -rf android
+          flutter create . --platforms=android --org com.kanzenaseem --project-name kanz_e_naseem
+          
+          # Set minSdk to 21 in android/app/build.gradle
+          sed -i 's/minSdk = flutter.minSdk/minSdk = 21/g' android/app/build.gradle
+          sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
+
+          # Inject permissions and Urdu app title
+          python3 -c "
+          p = 'android/app/src/main/AndroidManifest.xml'
+          with open(p, 'r') as f:
+              c = f.read()
+          perms = '''    <uses-permission android:name=\"android.permission.INTERNET\"/>\n    <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>\n    <uses-permission android:name=\"android.permission.WAKE_LOCK\"/>\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\n'''
+          if '<application' in c:
+              c = c.replace('<application', perms + '    <application')
+              c = c.replace('android:label=\"kanz_e_naseem\"', 'android:label=\"کنزِ نسیم\"')
+          with open(p, 'w') as f:
+              f.write(c)
+          "
+
       - name: Get Flutter Dependencies
         run: flutter pub get
 
       - name: Build Android Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
