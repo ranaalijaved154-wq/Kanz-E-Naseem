@@ -29,3 +29,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/books/
+    - assets/book_covers/
+    - assets/gallery/

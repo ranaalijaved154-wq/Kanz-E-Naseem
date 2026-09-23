@@ -49,6 +49,72 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _handleSecretAdminGesture() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.security_rounded, color: AppTheme.accentGold),
+            const SizedBox(width: 8),
+            Text(
+              'خفیہ ایڈمن پورٹل',
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.primaryDark,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'یہ رسائی صرف مجاز ماسٹر ایڈمن کے لیے مخصوص ہے۔',
+              textAlign: TextAlign.right,
+              style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryEmerald.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                AppConstants.adminEmail,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.outfit(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryEmerald,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                setState(() => _isLoading = true);
+                await _authService.signInAsMasterAdmin();
+                if (mounted) setState(() => _isLoading = false);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryEmerald,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              icon: const Icon(Icons.verified_user_rounded, color: AppTheme.accentGoldLight),
+              label: const Text('بطور ایڈمن داخل ہوں'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -199,22 +265,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Islamic Brand Header
+                    // Islamic Brand Header (with secret admin long-press gesture)
                     Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryEmerald.withOpacity(0.08),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppTheme.accentGold.withOpacity(0.4),
-                            width: 2,
+                      child: GestureDetector(
+                        onLongPress: _handleSecretAdminGesture,
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryEmerald.withOpacity(0.08),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.accentGold.withOpacity(0.4),
+                              width: 2,
+                            ),
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.menu_book_rounded,
-                          size: 46,
-                          color: AppTheme.primaryEmerald,
+                          child: const Icon(
+                            Icons.menu_book_rounded,
+                            size: 46,
+                            color: AppTheme.primaryEmerald,
+                          ),
                         ),
                       ),
                     ),
@@ -363,36 +432,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _handleLogin,
                           ),
                           const SizedBox(height: 16),
-
-                          // Direct Admin Access
-                          OutlinedButton.icon(
-                            onPressed: () async {
-                              setState(() => _isLoading = true);
-                              await _authService.signInAsMasterAdmin();
-                              if (mounted) setState(() => _isLoading = false);
-                            },
-                            icon: const Icon(Icons.verified_user_rounded,
-                                color: AppTheme.accentGoldDark, size: 20),
-                            label: Text(
-                              'بطور خاکسار ایڈمن: علی جاوید داخل ہوں',
-                              style: GoogleFonts.amiri(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.primaryDark,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              side: const BorderSide(
-                                  color: AppTheme.accentGold, width: 1.5),
-                              backgroundColor:
-                                  AppTheme.accentGold.withOpacity(0.08),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
 
                           // Guest Access
                           Center(

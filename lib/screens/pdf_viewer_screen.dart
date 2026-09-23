@@ -31,6 +31,8 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   bool get _isNetworkPdf =>
       widget.pdfUrl.startsWith('http://') || widget.pdfUrl.startsWith('https://');
 
+  bool get _isAssetPdf => widget.pdfUrl.startsWith('assets/');
+
   void _toggleBookmark() {
     setState(() {
       if (_bookmarks.contains(_currentPage)) {
@@ -259,9 +261,9 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       ),
       body: Stack(
         children: [
-          // Render Network or Local File PDF
-          _isNetworkPdf
-              ? SfPdfViewer.network(
+          // Render Asset, Network or Local File PDF
+          _isAssetPdf
+              ? SfPdfViewer.asset(
                   widget.pdfUrl,
                   controller: _pdfViewerController,
                   canShowScrollHead: true,
@@ -285,30 +287,55 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                     });
                   },
                 )
-              : SfPdfViewer.file(
-                  File(widget.pdfUrl),
-                  controller: _pdfViewerController,
-                  canShowScrollHead: true,
-                  canShowScrollStatus: true,
-                  onDocumentLoaded: (PdfDocumentLoadedDetails details) {
-                    setState(() {
-                      _pageCount = details.document.pages.count;
-                      _isLoading = false;
-                      _errorMessage = null;
-                    });
-                  },
-                  onPageChanged: (PdfPageChangedDetails details) {
-                    setState(() {
-                      _currentPage = details.newPageNumber;
-                    });
-                  },
-                  onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
-                    setState(() {
-                      _isLoading = false;
-                      _errorMessage = details.description;
-                    });
-                  },
-                ),
+              : _isNetworkPdf
+                  ? SfPdfViewer.network(
+                      widget.pdfUrl,
+                      controller: _pdfViewerController,
+                      canShowScrollHead: true,
+                      canShowScrollStatus: true,
+                      onDocumentLoaded: (PdfDocumentLoadedDetails details) {
+                        setState(() {
+                          _pageCount = details.document.pages.count;
+                          _isLoading = false;
+                          _errorMessage = null;
+                        });
+                      },
+                      onPageChanged: (PdfPageChangedDetails details) {
+                        setState(() {
+                          _currentPage = details.newPageNumber;
+                        });
+                      },
+                      onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+                        setState(() {
+                          _isLoading = false;
+                          _errorMessage = details.description;
+                        });
+                      },
+                    )
+                  : SfPdfViewer.file(
+                      File(widget.pdfUrl),
+                      controller: _pdfViewerController,
+                      canShowScrollHead: true,
+                      canShowScrollStatus: true,
+                      onDocumentLoaded: (PdfDocumentLoadedDetails details) {
+                        setState(() {
+                          _pageCount = details.document.pages.count;
+                          _isLoading = false;
+                          _errorMessage = null;
+                        });
+                      },
+                      onPageChanged: (PdfPageChangedDetails details) {
+                        setState(() {
+                          _currentPage = details.newPageNumber;
+                        });
+                      },
+                      onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+                        setState(() {
+                          _isLoading = false;
+                          _errorMessage = details.description;
+                        });
+                      },
+                    ),
 
           // Loading overlay
           if (_isLoading)

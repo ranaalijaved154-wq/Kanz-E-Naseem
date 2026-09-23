@@ -19,6 +19,10 @@ class AuthWrapper extends StatelessWidget {
       stream: authService.appUserStream,
       initialData: authService.currentAppUser,
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+          return const _LoadingSplash();
+        }
+
         final UserModel? user = snapshot.data;
 
         // 1. User not logged in -> Show LoginScreen
@@ -28,8 +32,8 @@ class AuthWrapper extends StatelessWidget {
 
         final bool isMaster = AppConstants.isMasterAdmin(user.email);
 
-        // 2. Master Admin or Admin Role -> Route to MainDashboardScreen with full Admin panel
-        if (isMaster || user.isAdmin) {
+        // 2. Master Admin -> Route to MainDashboardScreen with Admin access
+        if (isMaster) {
           return MainDashboardScreen(
             user: user,
             isAdmin: true,

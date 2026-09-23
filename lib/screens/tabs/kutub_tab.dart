@@ -155,139 +155,160 @@ class _KutubTabState extends State<KutubTab> {
     );
   }
 
-  Widget _buildBookCard(BookModel book) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+  void _openBook(BookModel book) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PdfViewerScreen(
+          title: book.title,
+          pdfUrl: book.fileUrl,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Cover Image with Top Badges
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  book.coverUrl.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: book.coverUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            color: AppTheme.primaryEmerald.withOpacity(0.08),
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
+    );
+  }
+
+  Widget _buildCoverImage(String coverUrl, String title) {
+    if (coverUrl.isEmpty) {
+      return _buildPlaceholderCover(title);
+    }
+    if (coverUrl.startsWith('assets/')) {
+      return Image.asset(
+        coverUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholderCover(title),
+      );
+    }
+    return CachedNetworkImage(
+      imageUrl: coverUrl,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(
+        color: AppTheme.primaryEmerald.withOpacity(0.08),
+        child: const Center(
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      errorWidget: (context, url, error) => _buildPlaceholderCover(title),
+    );
+  }
+
+  Widget _buildBookCard(BookModel book) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _openBook(book),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Cover Image with Top Badges
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      _buildCoverImage(book.coverUrl, book.title),
+
+                      // Page Count Badge
+                      if (book.totalPages > 0)
+                        Positioned(
+                          bottom: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.75),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${book.totalPages} صفحات',
+                              style: GoogleFonts.outfit(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                          errorWidget: (context, url, error) => _buildPlaceholderCover(book.title),
-                        )
-                      : _buildPlaceholderCover(book.title),
-
-                  // Page Count Badge
-                  if (book.totalPages > 0)
-                    Positioned(
-                      bottom: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.75),
-                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          '${book.totalPages} صفحات',
-                          style: GoogleFonts.outfit(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+
+                      // Admin Delete Button
+                      if (widget.isAdmin)
+                        Positioned(
+                          top: 6,
+                          left: 6,
+                          child: CircleAvatar(
+                            radius: 15,
+                            backgroundColor: Colors.red.shade700.withOpacity(0.85),
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: const Icon(Icons.delete_outline, size: 16, color: Colors.white),
+                              onPressed: () => _confirmDelete(book),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-
-                  // Admin Delete Button
-                  if (widget.isAdmin)
-                    Positioned(
-                      top: 6,
-                      left: 6,
-                      child: CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.red.shade700.withOpacity(0.85),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.delete_outline, size: 16, color: Colors.white),
-                          onPressed: () => _confirmDelete(book),
-                        ),
-                      ),
-                    ),
-                ],
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          // Title & Read Button
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  book.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.right,
-                  style: GoogleFonts.amiri(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.primaryDark,
-                  ),
-                ),
-                if (book.description.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    book.description,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                  ),
-                ],
-                const SizedBox(height: 8),
-
-                // Read Book Button
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PdfViewerScreen(
-                          title: book.title,
-                          pdfUrl: book.fileUrl,
-                        ),
+              // Title & Read Button
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      book.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: GoogleFonts.amiri(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryDark,
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryEmerald,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  icon: const Icon(Icons.chrome_reader_mode_rounded, size: 16),
-                  label: const Text('مطالعہ کریں', style: TextStyle(fontSize: 13)),
+                    ),
+                    if (book.description.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        book.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+
+                    // Read Book Button
+                    ElevatedButton.icon(
+                      onPressed: () => _openBook(book),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryEmerald,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: const Icon(Icons.chrome_reader_mode_rounded, size: 16),
+                      label: const Text('مطالعہ کریں', style: TextStyle(fontSize: 13)),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
