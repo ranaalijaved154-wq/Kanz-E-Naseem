@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_constants.dart';
@@ -16,91 +15,38 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = AuthService();
 
-    return StreamBuilder<User?>(
-      stream: authService.authStateChanges,
-      builder: (context, authSnapshot) {
-        // 1. Loading state while checking authentication
-        if (authSnapshot.connectionState == ConnectionState.waiting) {
-          return const _LoadingSplash();
-        }
+    return StreamBuilder<UserModel?>(
+      stream: authService.appUserStream,
+      initialData: authService.currentAppUser,
+      builder: (context, snapshot) {
+        final UserModel? user = snapshot.data;
 
-        // 2. User is not logged in -> show LoginScreen
-        if (!authSnapshot.hasData || authSnapshot.data == null) {
+        // 1. User not logged in -> Show LoginScreen
+        if (user == null) {
           return const LoginScreen();
         }
 
-        final User firebaseUser = authSnapshot.data!;
+        final bool isMaster = AppConstants.isMasterAdmin(user.email);
 
-        // 3. User is logged in -> Listen to Firestore 'users' collection in real-time
-        return StreamBuilder<UserModel?>(
-          stream: authService.streamUser(firebaseUser.uid),
-          builder: (context, userSnapshot) {
-            // Check if Master Admin email
-            final bool isMasterAdmin =
-                AppConstants.isMasterAdmin(firebaseUser.email);
+        // 2. Master Admin or Admin Role -> Route to MainDashboardScreen with full Admin panel
+        if (isMaster || user.isAdmin) {
+          return MainDashboardScreen(
+            user: user,
+            isAdmin: true,
+          );
+        }
 
-            // While waiting for initial Firestore document load
-            if (userSnapshot.connectionState == ConnectionState.waiting &&
-                !userSnapshot.hasData) {
-              // Master admin bypasses initial delay to guarantee immediate access
-              if (isMasterAdmin) {
-                return MainDashboardScreen(
-                  user: UserModel(
-                    uid: firebaseUser.uid,
-                    name: firebaseUser.displayName ?? AppConstants.adminDisplayName,
-                    email: firebaseUser.email ?? AppConstants.adminEmail,
-                    role: AppConstants.roleAdmin,
-                    isApproved: true,
-                    status: AppConstants.statusApproved,
-                  ),
-                  isAdmin: true,
-                );
-              }
-              return const _LoadingSplash();
-            }
+        // 3. Approved User -> Route to MainDashboardScreen
+        if (user.isApproved == true ||
+            user.status == AppConstants.statusApproved) {
+          return MainDashboardScreen(
+            user: user,
+            isAdmin: false,
+          );
+        }
 
-            final UserModel? userModel = userSnapshot.data;
-
-            // Transient state: User just registered but doc is still being committed
-            if (userModel == null) {
-              if (isMasterAdmin) {
-                return MainDashboardScreen(
-                  user: UserModel(
-                    uid: firebaseUser.uid,
-                    name: firebaseUser.displayName ?? AppConstants.adminDisplayName,
-                    email: firebaseUser.email ?? AppConstants.adminEmail,
-                    role: AppConstants.roleAdmin,
-                    isApproved: true,
-                    status: AppConstants.statusApproved,
-                  ),
-                  isAdmin: true,
-                );
-              }
-              // Temporarily show waiting screen while document synchronizes
-              return const WaitingApprovalScreen();
-            }
-
-            // A) Master Admin or Admin Role -> Route directly to MainDashboardScreen with Admin panel
-            if (isMasterAdmin || userModel.isAdmin) {
-              return MainDashboardScreen(
-                user: userModel,
-                isAdmin: true,
-              );
-            }
-
-            // B) Approved User -> Route to MainDashboardScreen
-            if (userModel.isApproved == true ||
-                userModel.status == AppConstants.statusApproved) {
-              return MainDashboardScreen(
-                user: userModel,
-                isAdmin: false,
-              );
-            }
-
-            // C) Unapproved / Pending User -> Route to WaitingApprovalScreen
-            return WaitingApprovalScreen(user: userModel);
-          },
-        );
+        // 4. Unapproved / Pending User -> Route to WaitingApprovalScreen
+        return WaitingApprovalScreen(user: user);
       },
     );
   }

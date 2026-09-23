@@ -362,6 +362,56 @@ class _LoginScreenState extends State<LoginScreen> {
                             isLoading: _isLoading,
                             onPressed: _handleLogin,
                           ),
+                          const SizedBox(height: 16),
+
+                          // Direct Admin Access
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              setState(() => _isLoading = true);
+                              await _authService.signInAsMasterAdmin();
+                              if (mounted) setState(() => _isLoading = false);
+                            },
+                            icon: const Icon(Icons.verified_user_rounded,
+                                color: AppTheme.accentGoldDark, size: 20),
+                            label: Text(
+                              'بطور خاکسار ایڈمن: علی جاوید داخل ہوں',
+                              style: GoogleFonts.amiri(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.primaryDark,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              side: const BorderSide(
+                                  color: AppTheme.accentGold, width: 1.5),
+                              backgroundColor:
+                                  AppTheme.accentGold.withOpacity(0.08),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Guest Access
+                          Center(
+                            child: TextButton.icon(
+                              onPressed: () async {
+                                await _authService.signInAsGuest();
+                              },
+                              icon: const Icon(Icons.explore_outlined,
+                                  color: AppTheme.primaryEmerald, size: 18),
+                              label: Text(
+                                'بطور مہمان کتب و بیانات دیکھیں (Guest)',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.primaryEmerald,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),

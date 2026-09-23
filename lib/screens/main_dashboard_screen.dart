@@ -57,13 +57,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
   Future<void> _approveUser(String uid, String userName) async {
     try {
-      await FirebaseFirestore.instance
-          .collection(AppConstants.usersCollection)
-          .doc(uid)
-          .update({
-        'isApproved': true,
-        'status': AppConstants.statusApproved,
-      });
+      await _authService.approveUser(uid);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -397,13 +391,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
           const SizedBox(height: 10),
 
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection(AppConstants.usersCollection)
-                .where('isApproved', isEqualTo: false)
-                .snapshots(),
+          StreamBuilder<List<UserModel>>(
+            stream: _authService.streamPendingUsers(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(24.0),
@@ -412,8 +403,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 );
               }
 
-              final docs = snapshot.data?.docs ?? [];
-              if (docs.isEmpty) {
+              final pendingUsers = snapshot.data ?? [];
+              if (pendingUsers.isEmpty) {
                 return Container(
                   padding: const EdgeInsets.all(24),
                   alignment: Alignment.center,
@@ -445,10 +436,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               }
 
               return Column(
-                children: docs.map((doc) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  final name = data['name'] ?? 'نامعلوم';
-                  final email = data['email'] ?? '—';
+                children: pendingUsers.map((pendingUser) {
+                  final name = pendingUser.name.isNotEmpty ? pendingUser.name : 'نامعلوم';
+                  final email = pendingUser.email.isNotEmpty ? pendingUser.email : '—';
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
@@ -501,7 +491,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                           ),
                         ),
                         ElevatedButton.icon(
-                          onPressed: () => _approveUser(doc.id, name),
+                          onPressed: () => _approveUser(pendingUser.uid, name),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryEmerald,
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'constants/app_constants.dart';
+import 'firebase_options.dart';
 import 'theme/app_theme.dart';
 import 'widgets/auth_wrapper.dart';
 
@@ -9,14 +10,17 @@ void main() async {
 
   bool firebaseInitialized = false;
   try {
-    // If you have run `flutterfire configure`, replace with:
-    // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     firebaseInitialized = true;
   } catch (e) {
-    debugPrint('Firebase initialization notice: $e');
-    // If google-services.json / GoogleService-Info.plist has not been configured yet,
-    // we catch this gracefully and allow the app to show a setup guidance screen.
+    try {
+      await Firebase.initializeApp();
+      firebaseInitialized = true;
+    } catch (e2) {
+      debugPrint('Firebase running in resilient local/offline mode: $e2');
+    }
   }
 
   runApp(KanzENaseemApp(isFirebaseReady: firebaseInitialized));
@@ -33,21 +37,23 @@ class KanzENaseemApp extends StatelessWidget {
       title: '${AppConstants.appNameUrdu} - ${AppConstants.appNameEnglish}',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: isFirebaseReady
-          ? const AuthWrapper()
-          : const _FirebaseSetupPendingScreen(),
+      home: const AuthWrapper(),
     );
   }
 }
 
-/// Helpful fallback screen displayed if Firebase configuration files are pending
-class _FirebaseSetupPendingScreen extends StatelessWidget {
-  const _FirebaseSetupPendingScreen();
+/// Fallback info screen (accessible on demand)
+class FirebaseSetupPendingScreen extends StatelessWidget {
+  const FirebaseSetupPendingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
+      appBar: AppBar(
+        title: const Text('Firebase سیٹ اپ گائیڈ'),
+        backgroundColor: AppTheme.primaryEmerald,
+      ),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -89,10 +95,10 @@ class _FirebaseSetupPendingScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        'Please configure Firebase for your Flutter app using the FlutterFire CLI or by adding:\n\n'
+                        'Please configure Firebase for your Flutter app by adding:\n\n'
                         '• Android: android/app/google-services.json\n'
                         '• iOS: ios/Runner/GoogleService-Info.plist\n\n'
-                        'Once added, rerun the app to activate Firebase Auth & Firestore.',
+                        'App will run in full local/offline mode until connected.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,
@@ -103,14 +109,17 @@ class _FirebaseSetupPendingScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () {
-                          // Try reinitializing
-                          main();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AuthWrapper()),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryEmerald,
                         ),
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('دوبارہ کوشش کریں (Retry)'),
+                        icon: const Icon(Icons.arrow_forward),
+                        label: const Text('ایپ میں داخل ہوں (Open App)'),
                       ),
                     ],
                   ),
