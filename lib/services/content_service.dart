@@ -72,6 +72,14 @@ class ContentService {
 
   final List<AudioModel> _localAudios = [
     AudioModel(
+      id: 'youtube_official_bayan_01',
+      title: 'ویڈیو بیانات و محافل: حضرت صوفی نسیم احمد قدس سرہ (آفیشل یوٹیوب)',
+      topic: 'ویڈیو بیانات (YouTube)',
+      duration: 'یوٹیوب',
+      fileUrl: AppConstants.youtubeChannelUrl,
+      createdAt: DateTime(2026, 9, 27),
+    ),
+    AudioModel(
       id: 'audio_01',
       title: 'بیانِ مبارک: عظمتِ شیخ و معرفتِ باطن',
       topic: 'ملفوظات شریف',

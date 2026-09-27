@@ -32,6 +32,13 @@ class AppConstants {
   static const String approvedStatusUrdu = "منظور شدہ (فعال اکاؤنٹ)";
   static const String rejectedStatusUrdu = "درخواست مسترد کر دی گئی";
 
+  // YouTube Official Channel
+  static const String youtubeChannelUrl = "https://www.youtube.com/@Nasimalsabir100";
+  static const String youtubeChannelHandle = "@Nasimalsabir100";
+  static const String youtubeChannelTitleUrdu = "یوٹیوب آفیشل چینل: نسیم الصابر";
+  static const String youtubeChannelSubtitleUrdu =
+      "حضور قبلہ سرکار صوفی نسیم احمد قدس سرہ کے تمام ویڈیو بیانات، محافل اور ارشادات";
+
   // Utility helper to check if an email is master admin
   static bool isMasterAdmin(String? email) {
     if (email == null) return false;

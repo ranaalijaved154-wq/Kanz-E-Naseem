@@ -47,3 +47,10 @@ local.properties
 # Local APK downloads
 build_output/
 **/GeneratedPluginRegistrant.java
+
+# Large media files (prevent GitHub 100MB limit rejection)
+*.mp4
+*.mkv
+*.mov
+assets/**/*.mp4
+assets/Biyan*

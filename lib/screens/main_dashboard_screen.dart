@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_constants.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
+import '../services/url_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/audio/mini_player_widget.dart';
 import 'admin/admin_dashboard_screen.dart';
@@ -95,6 +96,24 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         ),
         backgroundColor: AppTheme.primaryEmerald,
         actions: [
+          // YouTube Official Channel Action Button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.red.shade700,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+            tooltip: 'یوٹیوب آفیشل چینل (${AppConstants.youtubeChannelHandle})',
+            onPressed: () => UrlService.openYouTubeChannel(context),
+          ),
+
           // Discrete Admin Portal icon (visible ONLY to Master Admin)
           if (isMaster)
             IconButton(
@@ -131,33 +150,67 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       color: AppTheme.primaryDark,
                     ),
                   ),
-                  if (isMaster)
-                    GestureDetector(
-                      onTap: _openAdminPanel,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppTheme.accentGold.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppTheme.accentGold, width: 0.8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.shield_rounded, size: 12, color: AppTheme.accentGoldDark),
-                            const SizedBox(width: 4),
-                            Text(
-                              'ایڈمن پورٹل',
-                              style: GoogleFonts.outfit(
-                                fontSize: 11,
-                                color: AppTheme.accentGoldDark,
-                                fontWeight: FontWeight.bold,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // YouTube Channel Quick Badge
+                      GestureDetector(
+                        onTap: () => UrlService.openYouTubeChannel(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.red.shade300, width: 0.8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.smart_display_rounded, size: 12, color: Colors.red.shade700),
+                              const SizedBox(width: 4),
+                              Text(
+                                'یوٹیوب بیانات',
+                                style: GoogleFonts.amiri(
+                                  fontSize: 11,
+                                  color: Colors.red.shade900,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                      if (isMaster) ...[
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: _openAdminPanel,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.accentGold.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppTheme.accentGold, width: 0.8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.shield_rounded, size: 12, color: AppTheme.accentGoldDark),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'ایڈمن پورٹل',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 11,
+                                    color: AppTheme.accentGoldDark,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
             ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../constants/app_constants.dart';
 import '../../models/audio_model.dart';
 import '../../services/audio_player_service.dart';
 import '../../services/content_service.dart';
+import '../../services/url_service.dart';
 import '../../theme/app_theme.dart';
 import '../full_audio_player_screen.dart';
 
@@ -25,6 +27,7 @@ class _SoutTabState extends State<SoutTab> {
 
   final List<String> _topics = [
     'تمام',
+    'ویڈیو بیانات (YouTube)',
     'ملفوظات شریف',
     'خطبات و بیانات',
     'روحانی محافل',
@@ -83,6 +86,128 @@ class _SoutTabState extends State<SoutTab> {
                       },
                     )
                   : null,
+            ),
+          ),
+        ),
+
+        // YouTube Official Channel Banner
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => UrlService.openYouTubeChannel(context),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF8E1B1B), // Elegant Islamic Dark Crimson
+                      Color(0xFFC4302B), // YouTube Red
+                    ],
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.red.withOpacity(0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'یوٹیوب آفیشل چینل',
+                                style: GoogleFonts.amiri(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.25),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  AppConstants.youtubeChannelHandle,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            'حضور قبلہ سرکار صوفی نسیم احمد قدس سرہ کے تمام ویڈیو بیانات دیکھنے کے لیے کلک کریں',
+                            style: GoogleFonts.amiri(
+                              color: Colors.white.withOpacity(0.92),
+                              fontSize: 11,
+                              height: 1.25,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'چینل دیکھیں',
+                            style: GoogleFonts.amiri(
+                              color: const Color(0xFFC4302B),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.open_in_new_rounded,
+                            size: 11,
+                            color: Color(0xFFC4302B),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -197,6 +322,101 @@ class _SoutTabState extends State<SoutTab> {
   }
 
   Widget _buildAudioCard(AudioModel audio) {
+    final isYouTube = audio.fileUrl.contains('youtube.com') ||
+        audio.fileUrl.contains('youtu.be');
+
+    if (isYouTube) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.red.shade300,
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          leading: Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.red.shade600,
+            ),
+            child: const Icon(
+              Icons.play_arrow_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+          title: Text(
+            audio.title,
+            textAlign: TextAlign.right,
+            style: GoogleFonts.amiri(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textDark,
+            ),
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.red.shade200, width: 0.8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.smart_display_rounded, size: 12, color: Colors.red.shade700),
+                    const SizedBox(width: 4),
+                    Text(
+                      'ویڈیو بیان (یوٹیوب)',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.red.shade900,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                audio.topic,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.accentGoldDark,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          trailing: widget.isAdmin
+              ? IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20, color: Colors.redAccent),
+                  onPressed: () => _confirmDelete(audio),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.open_in_new_rounded, color: Colors.redAccent),
+                  onPressed: () => UrlService.launchWebUrl(context, audio.fileUrl),
+                ),
+          onTap: () => UrlService.launchWebUrl(context, audio.fileUrl),
+        ),
+      );
+    }
+
     return ValueListenableBuilder<AudioModel?>(
       valueListenable: _playerService.currentAudioNotifier,
       builder: (context, currentAudio, _) {
